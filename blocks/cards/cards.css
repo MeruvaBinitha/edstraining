@@ -1,27 +1,195 @@
+/* ===========================
+   CARDS BLOCK
+   =========================== */
+
+/* --- GRID: 3 per row on desktop --- */
 .cards > ul {
   list-style: none;
   margin: 0;
   padding: 0;
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  grid-template-columns: repeat(3, 1fr);
   gap: 24px;
 }
 
+/* --- CARD --- */
 .cards > ul > li {
+  position: relative;
+  overflow: hidden;
   border: 1px solid #dadada;
-  background-color: var(--background-color);
+  background-color: var(--background-color, #fff);
+  border-radius: 10px;
+  transition: transform 160ms ease, box-shadow 160ms ease;
+  isolation: isolate; /* ensures overlays layer correctly */
 }
 
-.cards .cards-card-body {
-  margin: 16px;
+.cards > ul > li:hover,
+.cards > ul > li:focus-within {
+  transform: translateY(-2px);
+  box-shadow: 0 10px 28px rgba(0, 0, 0, 0.10);
 }
 
+/* --- IMAGE --- */
 .cards .cards-card-image {
   line-height: 0;
 }
 
+.cards > ul > li picture,
 .cards > ul > li img {
+  display: block;
   width: 100%;
-  aspect-ratio: 4 / 3;
+}
+
+.cards > ul > li img {
+  aspect-ratio: 4 / 3; /* consistent height */
   object-fit: cover;
+  transition: filter 220ms ease, transform 220ms ease;
+}
+
+/* Slight zoom + dim on hover */
+.cards > ul > li:hover img,
+.cards > ul > li:focus-within img {
+  filter: brightness(0.6);
+  transform: scale(1.02);
+}
+
+/* --- BODY is the layering container --- */
+.cards .cards-card-body {
+  position: absolute;
+  inset: 0;
+  margin: 0;
+  padding: 0;
+  pointer-events: none; /* enabled only when visible */
+}
+
+/* --- BLUE FOOTER (icon + title) --- */
+.cards .cards-footer {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 2;
+  background: var(--cards-accent, #1660FF);
+  color: #fff;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 14px 16px;
+  min-height: 56px;
+  transition: opacity 180ms ease, transform 180ms ease;
+}
+
+.cards .cards-footer .icon {
+  width: 18px;
+  height: 18px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0.95;
+}
+
+.cards .cards-footer .title {
+  font: 600 16px/1.2 system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", "Liberation Sans", sans-serif;
+  color: #fff;
+}
+
+/* Footer fades down on hover, to emphasize the description */
+.cards > ul > li:hover .cards-footer,
+.cards > ul > li:focus-within .cards-footer {
+  opacity: 0;
+  transform: translateY(8px);
+}
+
+/* --- OVERLAY wrapper (centers content) --- */
+.cards .cards-overlay {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center; /* centers content */
+  pointer-events: none;
+  z-index: 3;
+}
+
+/* Dark scrim behind centered text */
+.cards .cards-overlay::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    to bottom,
+    rgba(0,0,0,0.35) 0%,
+    rgba(0,0,0,0.55) 50%,
+    rgba(0,0,0,0.35) 100%
+  );
+  opacity: 0;
+  transition: opacity 180ms ease;
+}
+
+/* --- Centered title + description --- */
+.cards .cards-overlay-content {
+  position: relative;
+  z-index: 1;
+  text-align: center;
+  color: #fff;
+  max-width: 80%;
+  opacity: 0;
+  transform: translateY(8px);
+  transition: opacity 200ms ease, transform 200ms ease;
+}
+
+.cards .cards-overlay-content h3,
+.cards .cards-overlay-content h4 {
+  margin: 0 0 10px 0;
+  color: #fff;
+  font-weight: 700;
+  font-size: 22px;
+  line-height: 1.2;
+}
+
+.cards .cards-overlay-content p {
+  margin: 0;
+  color: #f1f1f1;
+  line-height: 1.5;
+  font-size: 15px;
+}
+
+/* Show the centered overlay and content on hover/focus */
+.cards > ul > li:hover .cards-card-body,
+.cards > ul > li:focus-within .cards-card-body {
+  pointer-events: auto;
+}
+
+.cards > ul > li:hover .cards-overlay::before,
+.cards > ul > li:focus-within .cards-overlay::before {
+  opacity: 1;
+}
+
+.cards > ul > li:hover .cards-overlay-content,
+.cards > ul > li:focus-within .cards-overlay-content {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* --- Accessibility: reduce motion --- */
+@media (prefers-reduced-motion: reduce) {
+  .cards > ul > li,
+  .cards .cards-overlay::before,
+  .cards .cards-overlay-content,
+  .cards .cards-footer,
+  .cards > ul > li img {
+    transition: none !important;
+    transform: none !important;
+  }
+}
+
+/* --- Responsive: 2 per row (tablet), 1 per row (mobile) --- */
+@media (max-width: 1024px) {
+  .cards > ul {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+@media (max-width: 640px) {
+  .cards > ul {
+    grid-template-columns: 1fr;
+  }
 }
